@@ -45,3 +45,70 @@ WHERE salary > 20000;
 SELECT * 
 FROM employees 
 WHERE salary <= 10000;
+
+UPDATE employees 
+SET first_name = 'Aisha' 
+WHERE id = 7;
+
+SELECT first_name 
+FROM employees 
+WHERE id = 5;
+
+DELETE FROM employees WHERE id = 5;
+
+DELETE FROM employees WHERE salary BETWEEN 30000.00 AND 31000.00;
+
+SELECT first_name 
+FROM employees 
+WHERE salary < 31000.00;
+
+SELECT first_name 
+FROM employees;
+
+
+SELECT FROM employees WHERE salary BETWEEN 14000.00 AND 50000.00;
+
+SELECT first_name 
+FROM employees 
+WHERE salary BETWEEN 14000.00 AND 50000.0;
+
+SELECT * FROM employees ORDER BY birth_date ASC;
+
+SELECT DISTINCT first_name FROM employees;
+
+SELECT first_name || ' ' || last_name AS nombre_completo
+FROM employees
+WHERE id=9;
+
+SELECT * FROM employees;
+
+SELECT * FROM employees WHERE first_name LIKE 'L%';
+
+SELECT * FROM employees WHERE first_name LIKE '%L%';
+
+-- SELECT age, COUNT(age) FROM users GROUP BY age;
+
+SELECT COUNT(id) FROM employees;
+
+SELECT MAX(salary) FROM employees;
+
+SELECT id, first_name, salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 1;
+
+SELECT title, AVG(salary) FROM employees GROUP BY title;
+
+SELECT title, MAX(salary), MIN(salary)
+FROM employees
+GROUP BY title;
+
+SELECT first_name, salary,
+ROUND((salary * 0.12), 2) AS ahorro_mensual
+FROM employees;
+
+SELECT first_name, salary,
+ROUND((salary * 0.21), 2) AS impuestos,
+ROUND(salary - (salary * 0.21), 2) AS salario_neto
+FROM employees;
+
