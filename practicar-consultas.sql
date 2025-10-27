@@ -1,5 +1,5 @@
 
--- REPASO CLASE 1 (primer repaso)
+-- REPASO CLASE 1 (practica_c1_1)
 
 
 CREATE DATABASE practica_c1_1;
@@ -94,7 +94,7 @@ SELECT first_name, salary,
 FROM users;
 
 
--- REPASO CLASE 1 (segundo repaso)
+-- REPASO CLASE 1 (practica_c1_2)
 
 CREATE DATABASE practica_c1_2;
 
@@ -199,3 +199,47 @@ ROUND(salary - (salary * 0.21), 2) AS salario_neto
 FROM employees;
 
 
+
+-- CLASE 2 (practica_c1_1)
+
+-- “En una red social un usuario puede crear varias publicaciones. 
+-- Las publicaciones tienen comentarios y esos comentarios los 
+-- hacen los usuarios.”
+
+CREATE TABLE posts (
+    id              INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id),
+    title           VARCHAR(100) NOT NULL,
+    body            TEXT,
+    publish_date    TIMESTAMPTZ NOT NULL DEFAULT NOW() 
+);
+
+INSERT INTO posts(user_id, title, body)
+VALUES (1, 'Post One', 'This is post one');
+
+SELECT *
+FROM users
+INNER JOIN posts ON users.id = posts.user_id;
+
+CREATE TABLE comments (
+id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+post_id INTEGER NOT NULL REFERENCES posts(id),
+user_id INTEGER NOT NULL REFERENCES users(id),
+body TEXT NOT NULL,
+created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO comments(post_id, user_id, body) 
+VALUES (1, 1, 'This is comment one');
+
+SELECT
+comments.body,
+posts.title,
+users.first_name,
+users.last_name
+FROM comments
+INNER JOIN posts ON posts.id = comments.post_id
+INNER JOIN users ON users.id = comments.user_id;
+
+
+-- CLASE 2 (practica_c1_2)
