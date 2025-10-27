@@ -1,0 +1,201 @@
+
+-- REPASO CLASE 1 (primer repaso)
+
+
+CREATE DATABASE practica_c1_1;
+
+CREATE TABLE IF NOT EXISTS users (
+id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+first_name VARCHAR(100) NOT NULL,
+last_name VARCHAR(100) NOT NULL,
+email VARCHAR(255) UNIQUE NOT NULL,
+password TEXT NOT NULL, 
+register_date TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- elimina: tabla + datos
+DROP TABLE users; 
+
+-- elimina: datos
+TRUNCATE users;
+
+-- alterando la tabla
+ALTER TABLE users ADD COLUMN age VARCHAR(3);
+ALTER TABLE users ALTER COLUMN age TYPE INTEGER USING age::integer;
+ALTER TABLE users DROP COLUMN age;
+
+-- introducir valores
+INSERT INTO users (first_name, last_name, email, password,age)
+VALUES ('Ada','Lovelace','ada@example.com','123456',36);
+
+INSERT INTO users (first_name, last_name, email, password,age) 
+VALUES ('Luffy', 'Monkey D.', 'luffy@mugiwara.com', '123456',17), 
+('Zoro', 'Roronoa', 'zoro@mugiwara.com', '123456',21),
+('Sanji', 'Vinsmoke', 'sanji@mugiwara.com', '123456',22);
+
+-- select
+SELECT * FROM users;
+
+SELECT first_name, email FROM users;
+
+-- where
+SELECT * FROM users WHERE age=22;
+
+-- delete and update
+UPDATE users SET age = 19 WHERE id = 2;
+
+DELETE FROM users WHERE id = 3;
+
+-- order by and between
+SELECT * FROM users ORDER BY id DESC;
+SELECT * FROM users ORDER BY id ASC;
+SELECT * FROM users WHERE age BETWEEN 20 AND 25;
+
+-- distinct and concatenate
+SELECT first_name || ' ' || last_name AS name FROM users;
+SELECT DISTINCT age FROM users;
+
+-- like and not like
+SELECT * FROM users WHERE last_name LIKE '%a%';
+SELECT * FROM users WHERE first_name LIKE 'S%';
+SELECT * FROM users WHERE first_name LIKE '%o';
+SELECT * FROM users WHERE last_name NOT LIKE '%r%';
+
+-- funciones select
+SELECT COUNT(id) FROM users;
+SELECT MAX(age) FROM users;
+SELECT MIN(age) FROM users;
+SELECT SUM(age) FROM users;
+SELECT AVG(age) FROM users;
+
+SELECT age, COUNT(age) FROM users GROUP BY age;
+
+-- mas funciones
+SELECT first_name, age, age + 5 AS age_in_5_years
+FROM users;
+
+ALTER TABLE users ADD COLUMN salary NUMERIC(10,2);
+
+UPDATE users
+SET salary = CASE id
+    WHEN 7 THEN 1234.10
+    WHEN 8 THEN 1500.50
+    WHEN 11 THEN 900.00
+    ELSE 1100.75
+END;
+
+SELECT first_name, salary,
+    salary * 0.12 AS ahorro_mensual
+FROM users;
+
+SELECT first_name, salary,
+    salary * 0.12 AS ahorro_mensual,
+     ROUND((salary * 0.12) * 3, 2) AS total_ahorrado_aproximado
+FROM users;
+
+
+-- REPASO CLASE 1 (segundo repaso)
+
+CREATE DATABASE practica_c1_2;
+
+CREATE TABLE IF NOT EXISTS employees (
+    id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    birth_date  DATE NOT NULL,  
+    first_name  VARCHAR(100) NOT NULL,
+    last_name   VARCHAR(255) NOT NULL
+);
+
+ALTER TABLE employees
+ADD COLUMN salary NUMERIC(10, 2),
+ADD COLUMN title VARCHAR(100),
+ADD COLUMN title_date DATE;
+
+INSERT INTO employees 
+    (birth_date, first_name, last_name, salary, title, title_date)
+VALUES
+    ('1990-05-15', 'Ana', 'Torres', 45000.50, 'Project Manager', '2020-01-10'),
+    ('1988-02-20', 'Luis', 'Gomez', 48000.00, 'Senior Developer', '2020-03-15'),
+    ('1995-11-30', 'Sofia', 'Chen', 32000.75, 'Data Analyst', '2020-06-01'),
+    ('1992-07-14', 'Carlos', 'Ruiz', 39000.00, 'Marketing Specialist', '2020-09-20'),
+    ('1985-09-05', 'Maria', 'Fernandez', 49500.00, 'HR Manager', '2020-11-05'),
+    ('1993-01-25', 'David', 'Garcia', 41000.00, 'Software Engineer', '2021-02-15'),
+    ('1991-04-12', 'David', 'Lopez', 42000.00, 'Systems Administrator', '2021-05-10'),
+    ('1994-08-19', 'David', 'Kim', 41500.00, 'Software Engineer', '2022-01-30'),
+    ('1996-03-08', 'Elena', 'Perez', 36000.00, 'UX/UI Designer', '2021-07-22'),
+    ('1987-12-01', 'Javier', 'Martin', 47000.00, 'Senior Developer', '2019-10-01'),
+    ('1998-06-22', 'Laura', 'Sanchez', 29000.00, 'Junior Developer', '2023-01-15'),
+    ('1990-10-17', 'Miguel', 'Gonzalez', 34000.00, 'Data Analyst', '2022-03-10'),
+    ('1989-05-29', 'Lucia', 'Diaz', 33000.00, 'Marketing Specialist', '2021-11-01'),
+    ('1997-02-11', 'Pablo', 'Moreno', 31000.00, 'QA Tester', '2022-08-14'),
+    ('1993-07-07', 'Carmen', 'Alvarez', 43000.00, 'Product Owner', '2021-04-05'),
+    ('1986-04-10', 'Sergio', 'Ramos', 46000.00, 'Project Manager', '2021-03-15'),
+    ('1991-08-22', 'Clara', 'Vega', 44500.00, 'Project Manager', '2022-05-20'),
+    ('1989-11-11', 'Pedro', 'Ortega', 48500.00, 'Senior Developer', '2021-01-30'),
+    ('1996-01-05', 'Isabel', 'Jimenez', 33000.00, 'Data Analyst', '2023-02-01'),
+    ('1994-06-30', 'Roberto', 'Navarro', 38500.00, 'Marketing Specialist', '2022-04-10'),
+    ('1984-03-18', 'Monica', 'Blanco', 49000.00, 'HR Manager', '2019-12-01'),
+    ('1990-09-09', 'Jorge', 'Sanz', 48000.00, 'HR Manager', '2022-07-15'),
+    ('1995-12-25', 'Raquel', 'Molina', 41800.00, 'Software Engineer', '2023-01-10'),
+    ('1987-10-02', 'Marcos', 'Iglesias', 43000.00, 'Systems Administrator', '2020-08-08'),
+    ('1992-02-14', 'Beatriz', 'Santos', 41500.00, 'Systems Administrator', '2022-10-25'),
+    ('1997-04-03', 'Daniel', 'Cruz', 37000.00, 'UX/UI Designer', '2022-06-12'),
+    ('1993-11-20', 'Natalia', 'Prieto', 36500.00, 'UX/UI Designer', '2021-09-05'),
+    ('1999-01-15', 'Oscar', 'Vidal', 29500.00, 'Junior Developer', '2023-03-01'),
+    ('2000-07-28', 'Eva', 'Romero', 28800.00, 'Junior Developer', '2023-04-20'),
+    ('1994-09-16', 'Hector', 'Gil', 31500.00, 'QA Tester', '2023-01-20'),
+    ('1995-08-01', 'Silvia', 'Castillo', 30500.00, 'QA Tester', '2022-11-30'),
+    ('1990-06-06', 'Ivan', 'Arias', 44000.00, 'Product Owner', '2022-02-18'),
+    ('1992-10-31', 'Sara', 'Flores', 43500.00, 'Product Owner', '2021-12-10');
+
+SELECT * FROM employees;
+
+SELECT id, first_name, salary FROM employees;
+
+SELECT * FROM employees WHERE id = 2;
+
+SELECT * FROM employees WHERE salary > 20000;
+
+SELECT * FROM employees WHERE salary <= 10000;
+
+UPDATE employees SET first_name = 'Aisha' WHERE id = 7;
+
+DELETE FROM employees WHERE id= 5;
+
+DELETE FROM employees WHERE salary BETWEEN 30000.00 AND 31000.00;
+
+SELECT first_name, last_name, salary FROM employees WHERE salary BETWEEN 14000 AND 50000;
+
+SELECT id, birth_date FROM employees ORDER BY birth_date ASC;
+
+SELECT DISTINCT first_name FROM employees;
+
+SELECT first_name || ' ' || last_name AS nombre_completo FROM employees WHERE id=9;
+
+SELECT * FROM employees WHERE first_name LIKE 'L%';
+
+SELECT * FROM employees WHERE first_name LIKE '%L%';
+
+SELECT COUNT(id) FROM employees;
+
+SELECT MAX(salary) FROM employees;
+
+SELECT id, first_name, last_name, salary 
+FROM employees
+WHERE salary = (SELECT MAX(salary) FROM employees);
+
+SELECT title, AVG(salary) FROM employees GROUP BY title;
+
+SELECT title, MAX(salary), MIN(salary)
+FROM employees
+GROUP BY title;
+
+SELECT first_name, salary,
+ROUND((salary * 0.12), 2) AS ahorro_mensual
+FROM employees;
+
+SELECT first_name, salary,
+ROUND((salary * 0.21), 2) AS impuestos,
+ROUND(salary - (salary * 0.21), 2) AS salario_neto
+FROM employees;
+
+
