@@ -93,6 +93,46 @@ SELECT first_name, salary,
      ROUND((salary * 0.12) * 3, 2) AS total_ahorrado_aproximado
 FROM users;
 
+-- CLASE 2 (practica_c1_1)
+
+-- “En una red social un usuario puede crear varias publicaciones. 
+-- Las publicaciones tienen comentarios y esos comentarios los 
+-- hacen los usuarios.”
+
+CREATE TABLE posts (
+    id              INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id),
+    title           VARCHAR(100) NOT NULL,
+    body            TEXT,
+    publish_date    TIMESTAMPTZ NOT NULL DEFAULT NOW() 
+);
+
+INSERT INTO posts(user_id, title, body)
+VALUES (1, 'Post One', 'This is post one');
+
+SELECT *
+FROM users
+INNER JOIN posts ON users.id = posts.user_id;
+
+CREATE TABLE comments (
+id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+post_id INTEGER NOT NULL REFERENCES posts(id),
+user_id INTEGER NOT NULL REFERENCES users(id),
+body TEXT NOT NULL,
+created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO comments(post_id, user_id, body) 
+VALUES (1, 1, 'This is comment one');
+
+SELECT
+comments.body,
+posts.title,
+users.first_name,
+users.last_name
+FROM comments
+INNER JOIN posts ON posts.id = comments.post_id
+INNER JOIN users ON users.id = comments.user_id;
 
 -- REPASO CLASE 1 (practica_c1_2)
 
@@ -199,47 +239,115 @@ ROUND(salary - (salary * 0.21), 2) AS salario_neto
 FROM employees;
 
 
-
--- CLASE 2 (practica_c1_1)
-
--- “En una red social un usuario puede crear varias publicaciones. 
--- Las publicaciones tienen comentarios y esos comentarios los 
--- hacen los usuarios.”
-
-CREATE TABLE posts (
-    id              INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    user_id         INTEGER NOT NULL REFERENCES users(id),
-    title           VARCHAR(100) NOT NULL,
-    body            TEXT,
-    publish_date    TIMESTAMPTZ NOT NULL DEFAULT NOW() 
+-- CLASE 2 (practica_c1_2)
+CREATE TABLE departments (
+id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+name TEXT NOT NULL
 );
 
-INSERT INTO posts(user_id, title, body)
-VALUES (1, 'Post One', 'This is post one');
+INSERT INTO departments(name) 
+VALUES ('Engineering'),
+('Marketing');
 
 SELECT *
-FROM users
-INNER JOIN posts ON users.id = posts.user_id;
+FROM departments;
 
-CREATE TABLE comments (
-id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-post_id INTEGER NOT NULL REFERENCES posts(id),
-user_id INTEGER NOT NULL REFERENCES users(id),
-body TEXT NOT NULL,
-created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
+ALTER TABLE employees
+ADD COLUMN department_id INTEGER REFERENCES departments(id);
 
-INSERT INTO comments(post_id, user_id, body) 
-VALUES (1, 1, 'This is comment one');
+UPDATE employees
+SET department_id = (SELECT id FROM departments WHERE name = 'Engineering')
+WHERE id=1 OR id=2;
+
+UPDATE employees
+SET department_id = (SELECT id FROM departments WHERE name = 'Marketing')
+WHERE id=3;
+
+SELECT *
+FROM employees;
+
 
 SELECT
-comments.body,
-posts.title,
-users.first_name,
-users.last_name
-FROM comments
-INNER JOIN posts ON posts.id = comments.post_id
-INNER JOIN users ON users.id = comments.user_id;
+    employees.first_name,
+    employees.last_name,
+    departments.name 
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id;
+
+-- de esta forma me sale el id del departamento
+SELECT first_name, last_name , title, department_id
+FROM employees;
+
+-- de esta forma me sale el nombre del departamento
+SELECT
+    employees.first_name,
+    employees.last_name,
+    departments.name 
+FROM
+    employees
+LEFT JOIN
+    departments ON employees.department_id = departments.id;
+
+INSERT INTO departments(name) 
+VALUES ('Sales'),
+('R&D'),
+('Legal'),
+('HR');
+
+SELECT *
+FROM departments;
 
 
--- CLASE 2 (practica_c1_2)
+-- añadimos los nuevos datos para los ejercicios extras
+
+TRUNCATE employees;
+
+SELECT * 
+FROM employees;
+
+INSERT INTO employees
+    (birth_date, first_name, last_name, salary, title, title_date, department_id)
+VALUES
+    -- 4 Engineering
+    ('1998-05-10', 'Elena', 'Vega', 42000.00, 'Backend Engineer', '2023-03-15', (SELECT id FROM departments WHERE name = 'Engineering')),
+    ('1996-11-20', 'Marco', 'Silva', 55000.00, 'Frontend Engineer', '2024-01-20', (SELECT id FROM departments WHERE name = 'Engineering')),
+    ('1995-02-05', 'Laura', 'Gimenez', 63500.00, 'Data Engineer', '2023-06-01', (SELECT id FROM departments WHERE name = 'Engineering')),
+    ('1997-07-30', 'Javier', 'Muñoz', 75000.00, 'DevOps', '2024-05-10', (SELECT id FROM departments WHERE name = 'Engineering')),
+
+    -- 3 Marketing
+    ('2000-01-15', 'Sofia', 'Reyes', 33000.00, 'SEO Specialist', '2023-02-10', (SELECT id FROM departments WHERE name = 'Marketing')),
+    ('1999-04-25', 'Daniel', 'Ortega', 39500.00, 'Content Manager', '2024-03-01', (SELECT id FROM departments WHERE name = 'Marketing')),
+    ('1996-08-12', 'Lucia', 'Campos', 48000.00, 'Brand Manager', '2023-11-15', (SELECT id FROM departments WHERE name = 'Marketing')),
+    
+    -- 2 Sales
+    ('2001-03-03', 'Pablo', 'Molina', 28000.00, 'Sales Rep', '2024-07-20', (SELECT id FROM departments WHERE name = 'Sales')),
+    ('1998-10-18', 'Carla', 'Suarez', 52000.00, 'Account Executive', '2023-01-30', (SELECT id FROM departments WHERE name = 'Sales')),
+    
+    -- 1 HR
+    ('1995-06-07', 'Roberto', 'Frias', 31000.00, 'HR Generalist', '2025-01-05', (SELECT id FROM departments WHERE name = 'HR')),
+
+    -- 2 Sin Departamento (NULL)
+    ('2003-09-22', 'Ana', 'Perez', 24000.00, 'Intern', '2024-09-01', NULL),
+    ('2002-12-01', 'David', 'Gomez', 27000.00, 'Support', '2023-10-10', NULL);
+
+
+SELECT
+    employees.first_name,
+    employees.last_name,
+    departments.name 
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id;
+
+SELECT
+    employees.first_name,
+    employees.last_name,
+    departments.name 
+FROM
+    employees
+LEFT JOIN
+    departments ON employees.department_id = departments.id;
+
