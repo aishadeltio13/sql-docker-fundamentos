@@ -351,3 +351,119 @@ FROM
 LEFT JOIN
     departments ON employees.department_id = departments.id;
 
+
+SELECT
+    departments.name,
+    count(employees.id) 
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id 
+GROUP BY 
+    departments.id;
+
+
+SELECT
+    departments.name,
+    count(employees.id) 
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id 
+WHERE 
+    department_id = (SELECT id FROM departments WHERE name = 'Engineering')
+GROUP BY 
+    departments.name;
+
+
+SELECT
+    departments.name,
+    AVG(employees.salary) AS average_salary
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id 
+GROUP BY 
+    departments.name;
+
+
+SELECT
+    departments.name,
+    MAX(employees.salary) AS max_salary
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id
+GROUP BY
+    departments.name
+ORDER BY
+    max_salary DESC
+LIMIT 1;
+
+-- otra forma seria usando subconsultas:
+SELECT
+    departments.name,
+    employees.salary AS max_salary
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id
+WHERE
+    employees.salary = (
+        SELECT MAX(salary) FROM employees
+    );
+
+
+SELECT
+    departments.name,
+    COUNT(DISTINCT employees.title)
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id
+GROUP BY
+    departments.name;
+
+SELECT
+    employees.first_name,
+    employees.last_name,
+    departments.name AS department_name
+FROM
+    employees
+LEFT JOIN
+    departments ON employees.department_id = departments.id
+ORDER BY
+    departments.name ASC,
+    employees.last_name ASC;
+
+-- respuesta CHATGPT
+SELECT
+    departments.name,
+    STRING_AGG(employees.last_name || ', ' || employees.first_name, '; ' ORDER BY employees.last_name) AS employee_list
+FROM
+    employees
+LEFT JOIN
+    departments ON employees.department_id = departments.id
+GROUP BY
+    departments.name
+ORDER BY
+    departments.name ASC;
+
+
+SELECT
+    departments.name,
+    COUNT(employees.title)
+FROM
+    employees
+INNER JOIN
+    departments ON employees.department_id = departments.id
+GROUP BY
+    departments.name
+LIMIT 3;
+
+
+-- ver la estructura que tiene una tabla
+SELECT column_name, data_type 
+FROM information_schema.columns 
+WHERE table_name = 'employees';
+
