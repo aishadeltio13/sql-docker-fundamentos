@@ -467,3 +467,174 @@ SELECT column_name, data_type
 FROM information_schema.columns 
 WHERE table_name = 'employees';
 
+-- EJERCICIOS EXTRA PROPUESTOS POR CHATGPT
+-- 1.Encuentra todos los empleados cuyo salario es mayor que el salario promedio de su departamento.
+SELECT 
+    e.first_name, 
+    e.last_name, 
+    e.salary, 
+    d.name AS department_name
+FROM 
+    employees e
+JOIN departments d ON e.department_id = d.id
+WHERE e.salary > (
+    SELECT AVG(salary)
+    FROM employees
+    WHERE department_id = e.department_id
+);
+
+-- 2.Asigna un ranking a los empleados de cada departamento según su salario, siendo 1 el salario más alto.
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.name AS department_name,
+    RANK() OVER(
+        PARTITION BY e.department_id 
+        ORDER BY e.salary DESC
+    ) AS salary_rank
+FROM employees e
+JOIN departments d ON e.department_id = d.id;
+
+-- partition: los grupos que hace; order by: cómo los ordena
+
+-- 3.Muestra, para cada empleado, cuánto gana por encima o por debajo del salario promedio de su departamento.
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.name AS department_name,
+    e.salary - AVG(e.salary) OVER(PARTITION BY e.department_id) AS salary_diff
+FROM employees e
+JOIN departments d ON e.department_id = d.id;
+
+-- se calcula el promedio del salario al que pertenece
+
+
+-- 4.Encuentra el departamento que tiene el salario promedio más alto.
+SELECT 
+    d.name AS department_name,
+    AVG(e.salary) OVER(PARTITION BY e.department_id) AS avg_salary
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+LIMIT(1);
+
+SELECT 
+    d.name AS department_name, 
+    AVG(e.salary) AS avg_salary
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+GROUP BY d.name
+ORDER BY avg_salary DESC
+LIMIT 1;
+
+-- 5.Encuentra los departamentos que solo tienen un empleado y dime quienes son.
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.salary,
+    d.name AS department_name
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+WHERE e.department_id IN (
+    SELECT department_id
+    FROM employees
+    GROUP BY department_id
+    HAVING COUNT(*) = 1
+);
+
+-- solo selecciona aquellos cuyo department_id este dentro de la subconsulta
+
+
+-- 6.Encuentra los departamentos que tienen más de 3 empleados y cuyo salario promedio es mayor a 40,000.
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.salary
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+WHERE e.department_id IN (
+    SELECT department_id
+    FROM employees
+    GROUP BY department_id
+    HAVING COUNT(*) = 3
+) AND e.salary > 40000;
+-- me dice a la persona que cumple con esos requisitos, no el departamento.
+
+SELECT 
+    d.name AS department_name, 
+    COUNT(e.id) AS total_employees, 
+    AVG(e.salary) AS avg_salary
+FROM departments d
+JOIN employees e ON e.department_id = d.id
+GROUP BY d.name
+HAVING COUNT(e.id) > 3 AND AVG(e.salary) > 40000;
+
+-- 7.Muestra el último empleado añadido (según title_date) de cada departamento.
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.title_date,
+    d.name AS department_name
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+WHERE e.title_date = (
+    SELECT MIN(e2.title_date)
+    FROM employees e2
+    WHERE e2.department_id = e.department_id
+);
+
+SELECT DISTINCT ON (e.department_id) 
+    e.first_name, 
+    e.last_name, 
+    d.name AS department_name, 
+    e.title_date
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+ORDER BY e.department_id, e.title_date DESC;
+
+-- permite DISTINCT ON (columna) para seleccionar solo una fila por cada valor distinto de esa columna.
+-- En este caso: una fila por cada department_id.
+-- Pero cuál fila se escoge depende del ORDER BY.
+
+
+-- 8. Muestra cada departamento con el salario máximo, mínimo y la diferencia entre ambos, ordenado por mayor dispersión.
+SELECT 
+    d.name AS department_name,
+    MAX(e.salary) AS max_salary,
+    MIN(e.salary) AS min_salary,
+    MAX(e.salary) - MIN(e.salary) AS dif_salary
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+GROUP BY d.name
+ORDER BY dif_salary DESC;
+
+
+-- 9.Encuentra todos los empleados cuyo título contiene la letra 'i' y que ganan más que el salario promedio de su departamento.
+
+SELECT 
+    e.first_name,
+    e.last_name,
+    e.title,
+    e.salary
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+WHERE e.title ILIKE '%i%'
+    AND e.salary > (
+    SELECT AVG(salary)
+    FROM employees
+    WHERE department_id = e.department_id
+    );
+
+-- poner ILIKE para que no nos distinga entre mayúsculas y minúsculas
+
+
+-- 10.Cuenta cuántos empleados tienen cada título dentro de cada departamento.
+SELECT 
+    d.name AS department_name,
+    e.title,
+    COUNT(e.id) AS total_employees
+FROM employees e
+JOIN departments d ON e.department_id = d.id
+GROUP BY d.name, e.title
+ORDER BY d.name, total_employees DESC;
