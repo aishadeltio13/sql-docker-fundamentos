@@ -638,3 +638,6 @@ FROM employees e
 JOIN departments d ON e.department_id = d.id
 GROUP BY d.name, e.title
 ORDER BY d.name, total_employees DESC;
+
+
+
