@@ -40,5 +40,9 @@ cur = connection.cursor()\
 connection es la conexión en sí.\
 cur (cursor) es el "obrero" que uso para enviar comandos (cur.execute()) y recoger resultados (cur.fetchall()).
 
+## **4. Continuar trabajando**
+Cuando acabamos de trabajar: docker compose stop
+Para volver a trabajar: docker composer start
+
 
 

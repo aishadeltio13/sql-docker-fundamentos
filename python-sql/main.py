@@ -25,6 +25,21 @@ cur = connection.cursor()
 
 print("BD conectada con éxito")
 
+# createTableUsers(). Debe crear la tabla departments
+def createTableUsers():
+    try:
+        query = """CREATE TABLE users (
+                        id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                        first_name TEXT NOT NULL,
+                        last_name TEXT NOT NULL,
+                        email TEXT NOT NULL,
+                        password TEXT NOT NULL
+                        );"""
+        cur.execute(query)
+        print("Tabla creada")
+    except:
+        print('Error creando tabla')
+# createTableUsers()
 
 # getUsers
 def getUsers():
@@ -32,7 +47,7 @@ def getUsers():
     cur.execute(query)
     print("Nuestros usuarios:",cur.fetchall())
 
-# getUsers()
+getUsers()
 
 
 # createUser
@@ -57,7 +72,7 @@ def createUser(first_name, last_name, email, password):
     except Exception as e:
         print("Error creando usuario:", e)
         
-# createUser("Eusebio","García","eusebio@gmail.com","123456")
+# createUser("AISHA","DEL TIO","AAAA@gmail.com","fregtr344")
 # connection.commit()
 
 
@@ -268,5 +283,5 @@ def insertar_empleados_en_lote(lista_de_empleados):
     except Exception as e:
         print(f"ERROR: {e}")
       
-insertar_empleados_en_lote(employees)
-getEmployeesWithDeparments()
+# insertar_empleados_en_lote(employees)
+# getEmployeesWithDeparments()
