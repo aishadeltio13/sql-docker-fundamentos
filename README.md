@@ -42,6 +42,7 @@ cur (cursor) es el "obrero" que uso para enviar comandos (cur.execute()) y recog
 
 ## **4. Continuar trabajando**
 Cuando acabamos de trabajar: docker compose stop
+
 Para volver a trabajar: docker composer start
 
 
